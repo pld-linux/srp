@@ -134,7 +134,7 @@ for directory in base libkrypto libsrp telnet; do
  cd $directory && libtoolize -c -f; aclocal && autoheader \
  	       && autoconf && automake; cd ..
 done
-aclocal && autoheader && autoconf && automake
+%{__aclocal} && autoheader && autoconf && automake
 %configure \
 	--with-inet6 \
 	--with-srp \
