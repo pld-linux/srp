@@ -1,0 +1,80 @@
+--- srp-2.1.0/base/configure.in.orig	2005-01-09 00:17:57.648496000 +0100
++++ srp-2.1.0/base/configure.in	2005-01-09 00:27:17.349917444 +0100
+@@ -152,10 +152,10 @@
+ fi
+ 
+ AC_MSG_CHECKING(location of shared mail directory)
+-for maildir in /var/spool/mail /var/mail /usr/spool/mail /usr/mail NONE; do
++for maildir in $MAILSPOOL /var/spool/mail /var/mail /usr/spool/mail /usr/mail NONE; do
+ 	if test "$maildir" = "NONE"; then
+ 		AC_MSG_RESULT(None)
+-	elif test -d $maildir; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(MAIL_SPOOL_DIR, "$maildir")
+ 		AC_MSG_RESULT($maildir)
+ 		break
+@@ -163,10 +163,10 @@
+ done
+ 
+ AC_MSG_CHECKING(location of user mail file)
+-for mailfile in Mailbox mailbox Mail mail .mail NONE; do
++for mailfile in $MAILFILE Mailbox mailbox Mail mail .mail NONE; do
+ 	if test "$mailfile" = "NONE"; then
+ 		AC_MSG_RESULT(None)
+-	elif test -f $HOME/$mailfile; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(MAIL_SPOOL_FILE, "$mailfile")
+ 		AC_MSG_RESULT($mailfile)
+ 		break
+@@ -174,10 +174,10 @@
+ done
+ 
+ AC_MSG_CHECKING(location of utmp)
+-for utmpdir in /var/run /var/adm /usr/adm /etc NONE; do
++for utmpdir in $UTMPDIR /var/run /var/adm /usr/adm /etc NONE; do
+ 	if test "$utmpdir" = "NONE"; then
+ 		AC_MSG_WARN(utmp file not found)
+-	elif test -f $utmpdir/utmp; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(_UTMP_FILE, "$utmpdir/utmp")
+ 		AC_MSG_RESULT($utmpdir)
+ 		break
+@@ -185,10 +185,10 @@
+ done
+ 
+ AC_MSG_CHECKING(location of wtmp)
+-for wtmpdir in /var/log /var/adm /usr/adm /etc NONE; do
++for wtmpdir in $WTMPDIR /var/log /var/adm /usr/adm /etc NONE; do
+ 	if test "$wtmpdir" = "NONE"; then
+ 		AC_MSG_WARN(wtmp file not found)
+-	elif test -f $wtmpdir/wtmp; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(_WTMP_FILE, "$wtmpdir/wtmp")
+ 		AC_MSG_RESULT($wtmpdir)
+ 		break
+@@ -196,10 +196,10 @@
+ done
+ 
+ AC_MSG_CHECKING(location of faillog)
+-for faillogdir in /var/log /var/adm /usr/adm /etc NONE; do
++for faillogdir in $FAILLOGDIR /var/log /var/adm /usr/adm /etc NONE; do
+ 	if test "$faillogdir" = "NONE"; then
+ 		AC_MSG_WARN(faillog file not found)
+-	elif test -f $faillogdir/faillog; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(FAILLOG_FILE, "$faillogdir/faillog")
+ 		AC_MSG_RESULT($faillogdir)
+ 		break
+@@ -207,10 +207,10 @@
+ done
+ 		
+ AC_MSG_CHECKING(location of lastlog)
+-for lastlogdir in /var/log /var/adm /usr/adm /etc NONE; do
++for lastlogdir in $LASTLOGDIR /var/log /var/adm /usr/adm /etc NONE; do
+ 	if test "$lastlogdir" = "NONE"; then
+ 		AC_MSG_WARN(lastlog file not found)
+-	elif test -f $lastlogdir/lastlog; then
++	elif true; then
+ 		AC_DEFINE_UNQUOTED(LASTLOG_FILE, "$lastlogdir/lastlog")
+ 		AC_MSG_RESULT($lastlogdir)
+ 		break
