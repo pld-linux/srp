@@ -153,7 +153,7 @@ aclocal && autoheader && autoconf && automake
 	#  --with-cryptolib
 	# SPX requires kerberos ;-(
 	# --with-spx
-make
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
