@@ -8,20 +8,15 @@ License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
 # Source0-md5:	de75bccdccfa7abd62e73ace82cb6337
-#Source1:	%{name}-passwd.pamd
-#Patch0:		%{name}-1.5.1-base.patch
-#Patch1:		%{name}-1.5.1-telnetautoconffix.patch
-#Patch2:		%{name}-libkrypto.patch
-#Patch3:		%{name}-1.5.1-sharedlibwrap-patch
-#Patch4:		%{name}-1.5.1-pam_eps.patch
-#Patch5:		%{name}-1.5.1-pam.patch
+Patch0:		%{name}-shared.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	gmp-devel
 BuildRequires:	libtool
-BuildRequires:	openssl-devel
+BuildRequires:	openssl-devel >= 0.9.7
 BuildRequires:	pam-devel
+BuildRequires:	zlib-devel
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	pam >= 0.77.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -39,44 +34,45 @@ przez potencjalnie niebezpieczne sieci. SRP oferuje zarówno
 bezpieczeñstwo i ulepszenia w stosunku do innych aktualnie dostêpnych
 technik autentyfikacji.
 
-%package lib
-Summary:	Shared SRP library
-Summary(pl):	Wspó³dzielona biblioteka SRP
+%package libs
+Summary:	Shared SRP libraries
+Summary(pl):	Wspó³dzielone biblioteki SRP
 Group:		Libraries
 
-%description lib
-Shared SRP library.
+%description libs
+Shared SRP libraries.
 
-%description lib -l pl
-Wspó³dzielona biblioteka SRP.
+%description libs -l pl
+Wspó³dzielone biblioteki SRP.
 
 %package devel
-Summary:	Headers files and development SRP library
-Summary(pl):	Pliki nag³ówkowe i biblioteki do programowania
+Summary:	Headers files for SRP libraries
+Summary(pl):	Pliki nag³ówkowe bibliotek SRP
 Group:		Development/Libraries
-#Requires:	%{name}-lib = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	openssl-devel
 
 %description devel
-Headers files and development SRP library.
+Headers files for SRP libraries.
 
 %description devel -l pl
-Pliki nag³ówkowe i biblioteki SRP.
+Pliki nag³ówkowe bibliotek SRP.
 
 %package static
-Summary:	Static SRP library
-Summary(pl):	Biblioteka statyczna SRP
+Summary:	Static SRP libraries
+Summary(pl):	Statyczne biblioteki SRP
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
-Static SRP library.
+Static SRP libraries.
 
 %description static -l pl
-Statyczna biblioteka SRP.
+Statyczne biblioteki SRP.
 
 %package telnet
 Summary:	Telnet client with SRP and IPv6 support
-Summary(pl):	Klient telnetu ze wsparciem dla SRP i IPv6
+Summary(pl):	Klient protoko³u telnet ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
 Requires:	%{name} = %{version}-%{release}
 
@@ -84,12 +80,12 @@ Requires:	%{name} = %{version}-%{release}
 Telnet client with Secure Remote Password protocol and IPv6 support.
 
 %description telnet -l pl
-Klient telnet ze wsparciem dla protoko³u Secure Remote Password i
-IPv6.
+Klient protoko³u telnet ze wsparciem dla protoko³u Secure Remote
+Password i IPv6.
 
 %package telnetd
 Summary:	Telnet server with SRP and IPv6 support
-Summary(pl):	Serwer telnetu ze wsparciem dla SRP i IPv6
+Summary(pl):	Serwer protoko³u telnet ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
@@ -97,8 +93,8 @@ Requires:	%{name} = %{version}-%{release}
 Telnet server with Secure Remote Password protocol and IPv6 support.
 
 %description telnetd -l pl
-Serwer telnet ze wsparciem dla protoko³u Secure Remote Password i
-IPv6.
+Serwer protoko³u telnet ze wsparciem dla protoko³u Secure Remote
+Password i IPv6.
 
 %package ftp
 Summary:	FTP client with SRP support
@@ -126,36 +122,58 @@ Serwer FTP ze wsparciem dla protoko³u Secure Remote Password.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-#for directory in base libkrypto libsrp telnet; do
-#	cd $directory
-#	%{__libtoolize}
-#	%{__aclocal}
-#	%{__autoheader}
-#	%{__autoconf}
-#	%{__automake}
-#	cd ..
-#done
-#%{__aclocal}
-#%{__autoheader}
-#%{__autoconf}
-#%{__automake}
-cp -f /usr/share/automake/config.* telnet
-%configure2_13 \
+cd libsrp
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+cd ../libkrypto
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+cd ../telnet
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+cd ../ftp
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+cd ../base
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+cd ..
+%{__aclocal}
+%{__autoconf}
+%{__automake}
+%configure \
+	LIBTERM="-ltinfo" \
+	--enable-shadowgrp \
 	--with-cast \
+	--with-engine \
 	--with-libcrack \
-	--with-srp
+	--with-openssl \
+	--with-pam \
+	--with-srp \
+	--with-zlib
+
 	# --with-inet6  - requires non-existing "support.h" in telnet/telnet/commands.c
-	# PAM support in passwd.srp is broken (it probably
+	# ??? [needs check] PAM support in passwd.srp is broken (it probably
 	# doesn't use pass specified by user.
-	# --with-libpam
-	# PLD still doesn't have des library !
-	# --with-des
-	# This library can be used instead of gmp
-	#  --with-cryptolib
-	# SPX requires kerberos ;-(
-	# --with-spx
+	# --with-spx	- SPX requires kerberos ;-(
 %{__make}
 
 %install
@@ -167,6 +185,7 @@ touch $RPM_BUILD_ROOT%{_sysconfdir}/tpasswd
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
+	SECUREDIR=/%{_lib}/security \
 	FAKEROOT=$RPM_BUILD_ROOT \
 	suidbins= \
 	suidubins=
@@ -188,8 +207,8 @@ mv -f $RPM_BUILD_ROOT%{_sbindir}/telnetd $RPM_BUILD_ROOT%{_sbindir}/telnetd.srp
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	lib -p /sbin/ldconfig
-%postun lib -p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -204,16 +223,18 @@ rm -rf $RPM_BUILD_ROOT
 %attr(4755,root,root) /sbin/eps_chkpwd
 %attr(755,root,root) /%{_lib}/security/pam_eps_*.so
 
-#%files lib
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/lib*.so
+%{_libdir}/lib*.la
 %{_includedir}/*.h
 
-#%files static
-#%defattr(644,root,root,755)
+%files static
+%defattr(644,root,root,755)
 %{_libdir}/lib*.a
 
 %files telnet
