@@ -52,7 +52,7 @@ Wspó³dzielona biblioteka SRP.
 Summary:	Headers files and development SRP library
 Summary(pl):	Pliki nag³ówkowe i biblioteki do programowania
 Group:		Development/Libraries
-Requires:	%{name}-lib = %{version}
+Requires:	%{name}-lib = %{version}-%{release}
 
 %description devel
 Headers files and development SRP library.
@@ -64,7 +64,7 @@ Pliki nag³ówkowe i biblioteki SRP.
 Summary:	Static SRP library
 Summary(pl):	Biblioteka statyczna SRP
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static SRP library.
@@ -76,7 +76,7 @@ Statyczna biblioteka SRP.
 Summary:	Telnet client with SRP and IPv6 support
 Summary(pl):	Klient telnetu ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description telnet
 Telnet client with Secure Remote Password protocol and IPv6 support.
@@ -89,7 +89,7 @@ IPv6.
 Summary:	Telnet server with SRP and IPv6 support
 Summary(pl):	Serwer telnetu ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description telnetd
 Telnet server with Secure Remote Password protocol and IPv6 support.
@@ -102,7 +102,7 @@ IPv6.
 Summary:	FTP client with SRP support
 Summary(pl):	Klient FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description ftp
 FTP client with Secure Remote Password protocol support.
@@ -114,7 +114,7 @@ Klient FTP ze wsparciem dla protoko³u Secure Remote Password.
 Summary:	FTP server with SRP support
 Summary(pl):	Serwer FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description ftpd
 FTP server with Secure Remote Password protocol support.
@@ -198,7 +198,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(600,root,root) %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/tpasswd
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/pam.d/*
 # Pam modules are required by main srp package so we don't split them
-%attr(755,root,root) /lib/security/*.so
+%attr(755,root,root) /%{_lib}/security/*.so
 
 %files lib
 %defattr(644,root,root,755)
