@@ -7,8 +7,7 @@ License:	SRP Open Source
 Group:		Applications/Networking
 Group(de):	Applikationen/Netzwerkwesen
 Group(pl):	Aplikacje/Sieciowe
-URL:		http://srp.stanford.edu/srp/
-Source0:	http://srp.stanford.edu/srp/%{name}-%{version}.tar.gz
+Source0:	http://www-cs-students.stanford.edu/~tjw/srp/source/%{name}-%{version}.tar.gz
 Source1:	%{name}-passwd.pamd
 Patch0:		%{name}-1.5.1-base.patch
 Patch1:		%{name}-1.5.1-telnetautoconffix.patch
@@ -16,6 +15,7 @@ Patch2:		%{name}-libkrypto.patch
 Patch3:		%{name}-1.5.1-sharedlibwrap-patch
 Patch4:		%{name}-1.5.1-pam_eps.patch
 Patch5:		%{name}-1.5.1-pam.patch
+URL:		http://srp.stanford.edu/
 BuildRequires:	gmp-devel
 BuildRequires:	pam-devel
 BuildRequires:	autoconf
