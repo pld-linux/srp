@@ -5,7 +5,7 @@ Version:	1.7.4
 Release:	1.1
 License:	SRP Open Source
 Group:		Applications/Networking
-Source0:	http://www-cs-students.stanford.edu/~tjw/srp/source/%{name}-%{version}.tar.gz
+Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
 # Source0-md5:	9d089682baae3448039e5f9990692410
 Source1:	%{name}-passwd.pamd
 Patch0:		%{name}-1.5.1-base.patch
@@ -15,11 +15,11 @@ Patch3:		%{name}-1.5.1-sharedlibwrap-patch
 Patch4:		%{name}-1.5.1-pam_eps.patch
 Patch5:		%{name}-1.5.1-pam.patch
 URL:		http://srp.stanford.edu/
-BuildRequires:	gmp-devel
-BuildRequires:	pam-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	gmp-devel
 BuildRequires:	libtool
+BuildRequires:	pam-devel
 Requires:	pam >= 0.77.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -133,10 +133,18 @@ Serwer FTP ze wsparciem dla protoko³u Secure Remote Password.
 
 %build
 for directory in base libkrypto libsrp telnet; do
- cd $directory && libtoolize -c -f; aclocal && autoheader \
- 	       && autoconf && automake; cd ..
+	cd $directory
+	%{__libtoolize}
+	%{__aclocal}
+	%{__autoheader}
+	%{__autoconf}
+	%{__automake}
+	cd ..
 done
-%{__aclocal} && autoheader && autoconf && automake
+%{__aclocal}
+%{__autoheader}
+%{__autoconf}
+%{__automake}
 %configure \
 	--with-inet6 \
 	--with-srp \
@@ -155,11 +163,14 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 install -d $RPM_BUILD_ROOT/etc/{pam.d,rc.d/init.d,sysconfig}
+
 install %{SOURCE1}			$RPM_BUILD_ROOT/etc/pam.d/passwd.srp
 touch $RPM_BUILD_ROOT%{_sysconfdir}/tpasswd
-%{__make} install DESTDIR="$RPM_BUILD_ROOT"
+
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT
+
 mv -f $RPM_BUILD_ROOT/bin/login		$RPM_BUILD_ROOT/bin/login.srp
 mv -f $RPM_BUILD_ROOT/bin/su		$RPM_BUILD_ROOT/bin/su.srp
 mv -f $RPM_BUILD_ROOT/bin/passwd	$RPM_BUILD_ROOT%{_bindir}/passwd.srp
