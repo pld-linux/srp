@@ -17,7 +17,7 @@ Patch4:		srp-1.5.1-pam_eps.patch
 Patch5:		srp-1.5.1-pam.patch
 BuildRequires:	gmp-devel
 BuildRequires:	pam-devel
-BuildRoot:	/tmp/%{name}-%{version}-root
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 SRP stands for the Secure Remote Password protocol, and it represents a new
