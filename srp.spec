@@ -191,7 +191,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc docs/* inst/INSTALL*
-%attr( 755,root,root) /bin/login.srp
+%attr(755,root,root) /bin/login.srp
 %attr(4755,root,root) /bin/su.srp
 %attr(755,root,root) %{_sbindir}/tconf
 %attr(4755,root,root) %{_bindir}/passwd.srp
