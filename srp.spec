@@ -1,19 +1,20 @@
+# TODO: everything
 Summary:	Secure Remote Password protocol
 Summary(pl):	Protokó³ SRP (bezpieczny system autoryzacji)
 Name:		srp
-Version:	1.7.4
-Release:	1.1
+Version:	2.1.0
+Release:	0.1
 License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
-# Source0-md5:	9d089682baae3448039e5f9990692410
-Source1:	%{name}-passwd.pamd
-Patch0:		%{name}-1.5.1-base.patch
-Patch1:		%{name}-1.5.1-telnetautoconffix.patch
-Patch2:		%{name}-libkrypto.patch
-Patch3:		%{name}-1.5.1-sharedlibwrap-patch
-Patch4:		%{name}-1.5.1-pam_eps.patch
-Patch5:		%{name}-1.5.1-pam.patch
+# Source0-md5:	de75bccdccfa7abd62e73ace82cb6337
+#Source1:	%{name}-passwd.pamd
+#Patch0:		%{name}-1.5.1-base.patch
+#Patch1:		%{name}-1.5.1-telnetautoconffix.patch
+#Patch2:		%{name}-libkrypto.patch
+#Patch3:		%{name}-1.5.1-sharedlibwrap-patch
+#Patch4:		%{name}-1.5.1-pam_eps.patch
+#Patch5:		%{name}-1.5.1-pam.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -52,7 +53,7 @@ Wspó³dzielona biblioteka SRP.
 Summary:	Headers files and development SRP library
 Summary(pl):	Pliki nag³ówkowe i biblioteki do programowania
 Group:		Development/Libraries
-Requires:	%{name}-lib = %{version}-%{release}
+#Requires:	%{name}-lib = %{version}-%{release}
 
 %description devel
 Headers files and development SRP library.
@@ -124,32 +125,27 @@ Serwer FTP ze wsparciem dla protoko³u Secure Remote Password.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
 
 %build
-for directory in base libkrypto libsrp telnet; do
-	cd $directory
-	%{__libtoolize}
-	%{__aclocal}
-	%{__autoheader}
-	%{__autoconf}
-	%{__automake}
-	cd ..
-done
-%{__aclocal}
-%{__autoheader}
-%{__autoconf}
-%{__automake}
-%configure \
-	--with-inet6 \
-	--with-srp \
+#for directory in base libkrypto libsrp telnet; do
+#	cd $directory
+#	%{__libtoolize}
+#	%{__aclocal}
+#	%{__autoheader}
+#	%{__autoconf}
+#	%{__automake}
+#	cd ..
+#done
+#%{__aclocal}
+#%{__autoheader}
+#%{__autoconf}
+#%{__automake}
+cp -f /usr/share/automake/config.* telnet
+%configure2_13 \
 	--with-cast \
-	--with-libcrack
+	--with-libcrack \
+	--with-srp
+	# --with-inet6  - requires non-existing "support.h" in telnet/telnet/commands.c
 	# PAM support in passwd.srp is broken (it probably
 	# doesn't use pass specified by user.
 	# --with-libpam
@@ -163,18 +159,24 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{pam.d,rc.d/init.d,sysconfig}
+install -d $RPM_BUILD_ROOT{/etc/{pam.d,rc.d/init.d,sysconfig},/bin,/sbin}
 
-install %{SOURCE1}			$RPM_BUILD_ROOT/etc/pam.d/passwd.srp
+#install %{SOURCE1}			$RPM_BUILD_ROOT/etc/pam.d/passwd.srp
 touch $RPM_BUILD_ROOT%{_sysconfdir}/tpasswd
 
 %{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+	DESTDIR=$RPM_BUILD_ROOT \
+	FAKEROOT=$RPM_BUILD_ROOT \
+	suidbins= \
+	suidubins=
 
-mv -f $RPM_BUILD_ROOT/bin/login		$RPM_BUILD_ROOT/bin/login.srp
+install base/src/su $RPM_BUILD_ROOT/bin/su
+install base/src/passwd $RPM_BUILD_ROOT%{_bindir}/passwd
+
 mv -f $RPM_BUILD_ROOT/bin/su		$RPM_BUILD_ROOT/bin/su.srp
-mv -f $RPM_BUILD_ROOT/bin/passwd	$RPM_BUILD_ROOT%{_bindir}/passwd.srp
-mv -f $RPM_BUILD_ROOT/bin/tconf		$RPM_BUILD_ROOT%{_sbindir}/tconf
+mv -f $RPM_BUILD_ROOT%{_bindir}/login	$RPM_BUILD_ROOT/bin/login.srp
+mv -f $RPM_BUILD_ROOT%{_bindir}/passwd	$RPM_BUILD_ROOT%{_bindir}/passwd.srp
+mv -f $RPM_BUILD_ROOT%{_bindir}/tconf	$RPM_BUILD_ROOT%{_sbindir}/tconf
 
 mv -f $RPM_BUILD_ROOT%{_bindir}/ftp	$RPM_BUILD_ROOT%{_bindir}/ftp.srp
 mv -f $RPM_BUILD_ROOT%{_bindir}/telnet	$RPM_BUILD_ROOT%{_bindir}/telnet.srp
@@ -196,20 +198,21 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/tconf
 %attr(4755,root,root) %{_bindir}/passwd.srp
 %attr(600,root,root) %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/tpasswd
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/pam.d/*
+#%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/pam.d/*
 # Pam modules are required by main srp package so we don't split them
-%attr(755,root,root) /%{_lib}/security/*.so
+%attr(4755,root,root) /sbin/eps_chkpwd
+%attr(755,root,root) /%{_lib}/security/pam_eps_*.so
 
-%files lib
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+#%files lib
+#%defattr(644,root,root,755)
+#%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
 
 %files devel
 %defattr(644,root,root,755)
 %{_includedir}/*.h
 
-%files static
-%defattr(644,root,root,755)
+#%files static
+#%defattr(644,root,root,755)
 %{_libdir}/lib*.a
 
 %files telnet
