@@ -20,6 +20,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	gmp-devel
 BuildRequires:	libtool
+BuildRequires:	openssl-devel
 BuildRequires:	pam-devel
 Requires:	pam >= 0.77.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
