@@ -71,7 +71,7 @@ Static SRP library.
 Statyczna biblioteka SRP.
 
 %package telnet
-Summary:	Telnet client with SRP and IPv6 support 
+Summary:	Telnet client with SRP and IPv6 support
 Summary(pl):	Klient telnetu ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
 Requires:	%{name} = %{version}
@@ -84,7 +84,7 @@ Klient telnet ze wsparciem dla protoko³u Secure Remote Password i
 IPv6.
 
 %package telnetd
-Summary:	Telnet server with SRP and IPv6 support 
+Summary:	Telnet server with SRP and IPv6 support
 Summary(pl):	Serwer telnetu ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
@@ -97,7 +97,7 @@ Serwer telnet ze wsparciem dla protoko³u Secure Remote Password i
 IPv6.
 
 %package ftp
-Summary:	FTP client with SRP support 
+Summary:	FTP client with SRP support
 Summary(pl):	Klient FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
