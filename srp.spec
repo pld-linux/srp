@@ -169,8 +169,6 @@ mv -f $RPM_BUILD_ROOT%{_bindir}/telnet	$RPM_BUILD_ROOT%{_bindir}/telnet.srp
 mv -f $RPM_BUILD_ROOT%{_sbindir}/ftpd	$RPM_BUILD_ROOT%{_sbindir}/ftpd.srp
 mv -f $RPM_BUILD_ROOT%{_sbindir}/telnetd $RPM_BUILD_ROOT%{_sbindir}/telnetd.srp
 
-gzip -9nf docs/* inst/INSTALL*
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -179,7 +177,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc docs/{srp.ps,draft*}.gz inst/INSTALL*
+%doc docs/* inst/INSTALL*
 %attr( 755,root,root) /bin/login.srp
 %attr(4755,root,root) /bin/su.srp
 %attr(755,root,root)  %{_sbindir}/tconf
