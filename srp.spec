@@ -20,6 +20,7 @@ BuildRequires:	pam-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libtool
+Requires:	pam >= 0.77.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
