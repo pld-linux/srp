@@ -5,8 +5,6 @@ Version:	1.7.4
 Release:	1
 License:	SRP Open Source
 Group:		Applications/Networking
-Group(de):	Applikationen/Netzwerkwesen
-Group(pl):	Aplikacje/Sieciowe
 Source0:	http://www-cs-students.stanford.edu/~tjw/srp/source/%{name}-%{version}.tar.gz
 Source1:	%{name}-passwd.pamd
 Patch0:		%{name}-1.5.1-base.patch
@@ -41,13 +39,6 @@ technik autentyfikacji.
 Summary:	Shared SRP library
 Summary(pl):	WspСЁdzielona biblioteka SRP
 Group:		Libraries
-Group(de):	Libraries
-Group(es):	Bibliotecas
-Group(fr):	Librairies
-Group(pl):	Biblioteki
-Group(pt_BR):	Bibliotecas
-Group(ru):	Библиотеки
-Group(uk):	Б╕бл╕отеки
 
 %description lib
 Shared SRP library.
@@ -59,13 +50,6 @@ WspСЁdzielona biblioteka SRP.
 Summary:	Headers files and development SRP library
 Summary(pl):	Pliki nagЁСwkowe i biblioteki do programowania
 Group:		Development/Libraries
-Group(de):	Entwicklung/Libraries
-Group(es):	Desarrollo/Bibliotecas
-Group(fr):	Development/Librairies
-Group(pl):	Programowanie/Biblioteki
-Group(pt_BR):	Desenvolvimento/Bibliotecas
-Group(ru):	Разработка/Библиотеки
-Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name}-lib = %{version}
 
 %description devel
@@ -78,13 +62,6 @@ Pliki nagЁСwkowe i biblioteki SRP.
 Summary:	Static SRP library
 Summary(pl):	Biblioteka statyczna SRP
 Group:		Development/Libraries
-Group(de):	Entwicklung/Libraries
-Group(es):	Desarrollo/Bibliotecas
-Group(fr):	Development/Librairies
-Group(pl):	Programowanie/Biblioteki
-Group(pt_BR):	Desenvolvimento/Bibliotecas
-Group(ru):	Разработка/Библиотеки
-Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name}-devel = %{version}
 
 %description static
@@ -97,8 +74,6 @@ Statyczna biblioteka SRP.
 Summary:	Telnet client with SRP and IPv6 support 
 Summary(pl):	Klient telnetu ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
-Group(de):	Applikationen/Netzwerkwesen
-Group(pl):	Aplikacje/Sieciowe
 Requires:	%{name} = %{version}
 
 %description telnet
@@ -112,8 +87,6 @@ IPv6.
 Summary:	Telnet server with SRP and IPv6 support 
 Summary(pl):	Serwer telnetu ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
-Group(de):	Netzwerkwesen/Server
-Group(pl):	Sieciowe/Serwery
 Requires:	%{name} = %{version}
 
 %description telnetd
@@ -127,8 +100,6 @@ IPv6.
 Summary:	FTP client with SRP support 
 Summary(pl):	Klient FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
-Group(de):	Netzwerkwesen/Server
-Group(pl):	Sieciowe/Serwery
 Requires:	%{name} = %{version}
 
 %description ftp
@@ -141,8 +112,6 @@ Klient FTP ze wsparciem dla protokoЁu Secure Remote Password.
 Summary:	FTP server with SRP support
 Summary(pl):	Serwer FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
-Group(de):	Netzwerkwesen/Server
-Group(pl):	Sieciowe/Serwery
 Requires:	%{name} = %{version}
 
 %description ftpd
