@@ -161,7 +161,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{pam.d,rc.d/init.d,sysconfig}
 install %{SOURCE1}		$RPM_BUILD_ROOT/etc/pam.d/passwd.srp
 touch				$RPM_BUILD_ROOT/etc/tpasswd
-make install	       DESTDIR="$RPM_BUILD_ROOT"
+%{__make} install	       DESTDIR="$RPM_BUILD_ROOT"
 mv $RPM_BUILD_ROOT/bin/login	$RPM_BUILD_ROOT/bin/login.srp
 mv $RPM_BUILD_ROOT/bin/su	$RPM_BUILD_ROOT/bin/su.srp
 mv $RPM_BUILD_ROOT/bin/passwd	$RPM_BUILD_ROOT%{_bindir}/passwd.srp
