@@ -1,0 +1,307 @@
+--- srp-2.1.0/libsrp/Makefile.am.orig	2003-05-01 10:47:39.000000000 +0200
++++ srp-2.1.0/libsrp/Makefile.am	2005-01-08 20:11:02.531325104 +0100
+@@ -6,27 +6,30 @@
+ 
+ noinst_HEADERS = t_defines.h t_read.h nys_config.h yp_misc.h endXXent.h getXXent.h setXXent.h getXXbyYY.h nss_defs.h nsswitch.h
+ 
+-lib_LIBRARIES = libsrp.a
++lib_LTLIBRARIES = libsrp.la
+ 
+-libsrp_a_SOURCES = \
++libsrp_la_SOURCES = \
+   t_client.c t_conf.c t_conv.c t_getpass.c t_sha.c t_math.c t_misc.c \
+   t_pw.c t_read.c t_server.c t_truerand.c cstr.c \
+   srp.c rfc2945_client.c rfc2945_server.c srp6_client.c srp6_server.c \
+   yp_misc.c yp_tpasswd.c yp_tconf.c nsw_tpasswd.c nsw_tconf.c nsswitch.c
+ 
+-AM_CFLAGS = @PICFLAG@
+-
+ bin_PROGRAMS = tconf
+ noinst_PROGRAMS = clitest srvtest getpwtest srptest srpbench srp6bench
+ 
+ clitest_SOURCES = clitest.c
++clitest_LDADD = libsrp.la
+ srvtest_SOURCES = srvtest.c
++srvtest_LDADD = libsrp.la
+ getpwtest_SOURCES = getpwtest.c
++getpwtest_LDADD = libsrp.la
+ srptest_SOURCES = srptest.c
++srptest_LDADD = libsrp.la
+ srpbench_SOURCES = srpbench.c
++srpbench_LDADD = libsrp.la
+ srp6bench_SOURCES = srp6bench.c
++srp6bench_LDADD = libsrp.la
+ tconf_SOURCES = tconf.c
+-
+-LDADD = libsrp.a
++tconf_LDADD = libsrp.la
+ 
+ INCLUDES =
+--- srp-2.1.0/libsrp/configure.in.orig	2003-04-21 10:14:29.000000000 +0200
++++ srp-2.1.0/libsrp/configure.in	2005-01-08 21:41:33.212736040 +0100
+@@ -11,14 +11,13 @@
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
+-AC_PROG_RANLIB
++AC_PROG_LIBTOOL
+ AC_ARG_PROGRAM
+ 
+ dnl Checks for libraries.
+ 
+-AC_CHECK_LIB(socket, socket)
+-AC_CHECK_LIB(nsl, gethostbyname)
+-AC_CHECK_LIB(dl, dlopen)
++AC_SEARCH_LIBS(socket, socket)
++AC_SEARCH_LIBS(gethostbyname, nsl)
+ 
+ dnl Checks for header files.
+ 
+@@ -40,7 +39,7 @@
+ 
+ AC_CHECK_FUNCS(sigaction strchr memcpy)
+ AC_TYPE_SIGNAL
+-AC_HEADER_CHECK(termios.h,AC_FUNC_CHECK(cfsetispeed,AC_DEFINE(POSIX_TERMIOS)))
++AC_HEADER_CHECK(termios.h,[AC_FUNC_CHECK(cfsetispeed,[AC_DEFINE(POSIX_TERMIOS)])])
+ 
+ dnl User options
+ 
+@@ -107,17 +106,11 @@
+ 	AC_DEFINE(ENABLE_YP)
+ fi
+ 
+-dnl Some platforms want PIC-compiled libsrp in a PAM module
+-
+-AC_SUBST(PICFLAG)
+ AC_SUBST(SHAREDFLAG)
+ if test "$GCC" = "yes"
+ then
+-	PICFLAG="-fPIC"
+ 	SHAREDFLAG="--shared"
+ else
+-	dnl TODO: let user specify PICFLAG...
+-	PICFLAG=""
+ 	SHAREDFLAG="-G"
+ fi
+ 
+--- srp-2.1.0/libkrypto/configure.in.orig	2003-04-21 11:23:07.000000000 +0200
++++ srp-2.1.0/libkrypto/configure.in	2005-01-08 20:22:10.923714016 +0100
+@@ -11,7 +11,7 @@
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
+-AC_PROG_RANLIB
++AC_PROG_LIBTOOL
+ AC_ARG_PROGRAM
+ 
+ dnl Checks for libraries.
+--- srp-2.1.0/libkrypto/Makefile.am.orig	2000-10-29 22:13:13.000000000 +0100
++++ srp-2.1.0/libkrypto/Makefile.am	2005-01-08 20:23:01.461031176 +0100
+@@ -7,9 +7,9 @@
+   cipher_imp_des.h cipher_imp_cast.h \
+   hash_imp_md5.h hash_imp_sha.h
+ 
+-lib_LIBRARIES = libkrypto.a
++lib_LTLIBRARIES = libkrypto.la
+ 
+-libkrypto_a_SOURCES = \
++libkrypto_la_SOURCES = \
+   krypto.c cipher.c cipher_crypt_ecb.c cipher_crypt_cbc.c \
+   cipher_crypt_cfb.c cipher_crypt_ofb.c hash.c krypto_rand_conf.c \
+   cipher_imp_cast.c cipher_imp_blowfish.c cipher_imp_des.c \
+@@ -19,11 +19,13 @@
+ noinst_PROGRAMS = cipher_test hash_test krypto_test cipher_bench
+ 
+ cipher_test_SOURCES = cipher_test.c
++cipher_test_LDADD = libkrypto.la ../libsrp/libsrp.la
+ hash_test_SOURCES = hash_test.c
++hash_test_LDADD = libkrypto.la ../libsrp/libsrp.la
+ krypto_test_SOURCES = krypto_test.c
++krypto_test_LDADD = libkrypto.la ../libsrp/libsrp.la
+ cipher_bench_SOURCES = cipher_bench.c
+-
+-LDADD = libkrypto.a ../libsrp/libsrp.a
++cipher_bench_LDADD = libkrypto.la ../libsrp/libsrp.la
+ 
+ TESTS = cipher_test hash_test krypto_test
+ 
+--- srp-2.1.0/telnet/libtelnet/Makefile.am.orig	2000-12-21 09:09:00.000000000 +0100
++++ srp-2.1.0/telnet/libtelnet/Makefile.am	2005-01-08 20:27:01.461545552 +0100
+@@ -5,8 +5,6 @@
+ 
+ noinst_LIBRARIES = libtelnet.a
+ 
+-libdir = ${prefix}/lib
+-
+ libtelnet_a_SOURCES = auth.c encrypt.c genget.c misc.c srp.c kerberos4c.c \
+  kerberos.c kerberos5.c forward.c spx.c rsaencpwd.c krb4encpwd.c \
+  enc_des.c enc_des_ede3.c enc_cast.c cast.c read_password.c \
+--- srp-2.1.0/telnet/configure.in.orig	2004-06-16 06:56:41.000000000 +0200
++++ srp-2.1.0/telnet/configure.in	2005-01-08 20:40:07.823000440 +0100
+@@ -11,18 +11,17 @@
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_MAKE_SET
+-AC_PROG_RANLIB
++AC_PROG_LIBTOOL
+ AC_ARG_PROGRAM
+ 
+ dnl Checks for libraries.
+ 
+ AC_ARG_ENABLE(ncurses, [  --disable-ncurses       don't look for -lncurses])
+ 
+-AC_CHECK_LIB(socket, socket)
+-AC_CHECK_LIB(nsl, gethostbyname)
+-AC_CHECK_LIB(resolv, gethostname)
+-AC_CHECK_LIB(util, logout)
+-AC_CHECK_LIB(dl, dlopen)
++AC_SEARCH_LIBS(socket, socket)
++AC_SEARCH_LIBS(gethostbyname, nsl)
++AC_SEARCH_LIBS(gethostname, resolv)
++AC_SEARCH_LIBS(logout, util)
+ 
+ if test -z "$LIBTERM"
+ then
+@@ -86,7 +86,7 @@
+ AC_FUNC_SETPGRP
+ AC_REPLACE_FUNCS([strcasecmp setenv getent getopt strdup strftime strerror herror parsetos strchr strrchr])
+ AC_CHECK_FUNCS([grantpt mktime modutx makeutx ptsname updwtmpx unlockpt vhangup])
+-AC_CHECK_FUNC(memmove, , LIBOBJS="$LIBOBJS mem.o")
++AC_CHECK_FUNC(memmove, , [AC_LIBOBJ([mem])])
+ AC_CHECK_FUNC(gettosbyname, AC_DEFINE(HAS_GETTOS))
+ dnl AC_CHECK_FUNC(modutx, AC_DEFINE(UTMPX))
+ 
+@@ -188,7 +187,7 @@
+ then
+ 	AC_DEFINE(HAVE_SRP)
+ 	CPPFLAGS="$CPPFLAGS -I../../libsrp"
+-	LIBS="-L../../libsrp -lsrp $LIBS"
++	LIBS="../../libsrp/libsrp.la $LIBS"
+ fi
+ 
+ if test -n "$with_krb5" -a "$with_krb5" != "no"
+--- srp-2.1.0/ftp/ftp/Makefile.am.orig	2002-01-30 07:08:22.000000000 +0100
++++ srp-2.1.0/ftp/ftp/Makefile.am	2005-01-08 20:40:55.489753992 +0100
+@@ -9,7 +9,7 @@
+ ftp_SOURCES = cmds.c cmdtab.c domacro.c getpass.c ftp.c pclose.c glob.c \
+   main.c radix.c ruserpass.c secure.c srp.c ftppath.c
+ 
+-LDADD = ../../libkrypto/libkrypto.a
++LDADD = ../../libkrypto/libkrypto.la
+ INCLUDES = -I../../libkrypto
+ 
+ EXTRA_DIST = ftp.M
+--- srp-2.1.0/ftp/ftpd/Makefile.am.orig	2002-01-30 07:09:11.000000000 +0100
++++ srp-2.1.0/ftp/ftpd/Makefile.am	2005-01-08 20:41:08.365796536 +0100
+@@ -11,7 +11,7 @@
+ EXTRA_DIST = getdtablesize.c setenv.c
+ 
+ LDADD = ../ftp/secure.o ../ftp/glob.o ../ftp/ftppath.o ../ftp/radix.o \
+-  ../../libkrypto/libkrypto.a @LIBOBJS@
++  ../../libkrypto/libkrypto.la @LIBOBJS@
+ 
+ INCLUDES = -I../../libkrypto
+ 
+--- srp-2.1.0/ftp/configure.in.orig	2003-04-21 10:14:29.000000000 +0200
++++ srp-2.1.0/ftp/configure.in	2005-01-08 20:43:13.844720840 +0100
+@@ -15,17 +15,17 @@
+ AC_PROG_INSTALL
+ AC_PROG_YACC
+ AC_ARG_PROGRAM
++AC_PROG_LIBTOOL
+ 
+ dnl Checks for libraries.
+ 
+-AC_CHECK_LIB(socket, socket)
+-AC_CHECK_LIB(nsl, gethostbyname)
+-AC_CHECK_LIB(crypt,crypt)
+-AC_CHECK_LIB(dl, dlopen)
++AC_SEARCH_LIBS(socket, socket)
++AC_SEARCH_LIBS(gethostbyname, nsl)
++AC_SEARCH_LIBS(crypt,crypt)
+ 
+ dnl Checks for header files.
+ 
+-AC_HEADER_CHECK(termios.h,AC_FUNC_CHECK(cfsetispeed,AC_DEFINE(POSIX_TERMIOS)))
++AC_HEADER_CHECK(termios.h,[AC_FUNC_CHECK(cfsetispeed,[AC_DEFINE(POSIX_TERMIOS)])])
+ AC_CHECK_HEADERS(stdarg.h stdlib.h string.h sys/select.h unistd.h)
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+@@ -217,7 +217,7 @@
+ then
+ 	AC_DEFINE(SRP)
+ 	CPPFLAGS="$CPPFLAGS -I../../libsrp"
+-	LIBS="-L../../libsrp -lsrp $LIBS"
++	LIBS="../../libsrp/libsrp.la $LIBS"
+ fi
+ 
+ AC_DEFINE(FTP_BUFSIZ,10240)
+--- srp-2.1.0/base/src/Makefile.am.orig	2001-03-11 11:06:23.000000000 +0100
++++ srp-2.1.0/base/src/Makefile.am	2005-01-08 20:45:25.487708064 +0100
+@@ -29,7 +29,7 @@
+ 
+ noinst_PROGRAMS = su passwd
+ 
+-LDADD=../libmisc/libmisc.a ../lib/libshadow.a -L../../libsrp -lsrp
++LDADD=../libmisc/libmisc.a ../lib/libshadow.a ../../libsrp/libsrp.la
+ 
+ INCLUDES= -I$(top_srcdir)/lib -I../../libsrp
+ 
+--- srp-2.1.0/base/libmisc/Makefile.am.orig	1998-12-10 02:43:21.000000000 +0100
++++ srp-2.1.0/base/libmisc/Makefile.am	2005-01-08 20:43:55.068453880 +0100
+@@ -3,8 +3,6 @@
+ 
+ noinst_LIBRARIES = libmisc.a
+ 
+-libdir = ${prefix}/lib
+-
+ INCLUDES = -I$(top_srcdir)/lib
+ 
+ libmisc_a_SOURCES = addgrps.c age.c basename.c chkname.c chowndir.c chowntty.c \
+--- srp-2.1.0/base/pam_eps/Makefile.in.orig	2001-04-09 00:11:31.000000000 +0200
++++ srp-2.1.0/base/pam_eps/Makefile.in	2005-01-08 20:52:23.626141360 +0100
+@@ -12,7 +12,7 @@
+ # do you need to include the one in this source?
+ #NEED_LCKPWDF=-DNEED_LCKPWDF
+ 
+-LIBS = -L../../libsrp -lsrp @LIBMATH@ @LIBS@
++LIBS = -L../../libsrp/.libs -lsrp @LIBMATH@ @LIBS@
+ 
+ CC = @CC@
+ DYNAMIC = @PICFLAG@
+--- srp-2.1.0/base/configure.in.orig	2003-04-21 10:14:29.000000000 +0200
++++ srp-2.1.0/base/configure.in	2005-01-08 20:50:26.616929464 +0100
+@@ -13,7 +13,7 @@
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
+ AC_PROG_MAKE_SET
+-AC_PROG_RANLIB
++AC_PROG_LIBTOOL
+ AC_ARG_PROGRAM
+ 
+ dnl Checks for libraries.
+@@ -242,7 +242,7 @@
+ 
+ dnl XXX - quick hack, should disappear before anyone notices :).
+ AC_DEFINE(SHADOWPWD)
+-AC_DEFINE(USG)
++AC_DEFINE(USG,,[USG])
+ AC_DEFINE(AGING)
+ AC_DEFINE(USE_SYSLOG)
+ AC_DEFINE(RLOGIN)
+@@ -252,10 +252,9 @@
+ AC_DEFINE(CONSOLE_GROUPS)
+ AC_DEFINE_UNQUOTED(DEFAULT_CRACKLIB_DICTPATH, "/lib:/usr/local/lib:/usr/lib:/usr/share/lib:/usr/local/share/lib")
+ 
+-AC_CHECK_LIB(inet, inet_network)
+-AC_CHECK_LIB(socket, socket)
+-AC_CHECK_LIB(nsl, gethostbyname)
+-AC_CHECK_LIB(dl, dlopen, LIBDL=" -ldl")
++AC_SEARCH_LIBS(inet_network, inet)
++AC_SEARCH_LIBS(socket, socket)
++AC_SEARCH_LIBS(gethostbyname, nsl)
+ 
+ AC_ARG_ENABLE(shadowgrp, [  --enable-shadowgrp      enable shadow group support], AC_DEFINE(SHADOWGRP))
+ AC_ARG_ENABLE(noisyshell, [  --enable-noisyshell	your shell prints motd, mail message], AC_DEFINE(NOISY_SHELL))
+--- srp-2.1.0/ftp/configure.in.orig	2005-01-08 21:42:06.458681000 +0100
++++ srp-2.1.0/ftp/configure.in	2005-01-08 21:59:29.834064720 +0100
