@@ -6,6 +6,7 @@ Release:	1
 License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://www-cs-students.stanford.edu/~tjw/srp/source/%{name}-%{version}.tar.gz
+# Source0-md5:	9d089682baae3448039e5f9990692410
 Source1:	%{name}-passwd.pamd
 Patch0:		%{name}-1.5.1-base.patch
 Patch1:		%{name}-1.5.1-telnetautoconffix.patch
