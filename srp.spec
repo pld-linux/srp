@@ -9,6 +9,7 @@ Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
 # Source0-md5:	de75bccdccfa7abd62e73ace82cb6337
 Patch0:		%{name}-shared.patch
+Patch1:		%{name}-paths.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -124,6 +125,7 @@ Serwer FTP ze wsparciem dla protoko³u Secure Remote Password.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 cd libsrp
@@ -149,19 +151,25 @@ cd ../ftp
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
-%{__automake}
+automake -a -c --foreign
 cd ../base
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
-%{__automake}
+automake -a -c --foreign
 cd ..
 %{__aclocal}
 %{__autoconf}
 %{__automake}
 %configure \
 	LIBTERM="-ltinfo" \
+	MAILSPOOL=/var/mail \
+	MAILFILE=Mail \
+	UTMPDIR=/var/run \
+	WTMPDIR=/var/log \
+	FAILLOGDIR=/var/log \
+	LASTLOGDIR=/var/log \
 	--enable-shadowgrp \
 	--with-cast \
 	--with-engine \
