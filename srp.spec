@@ -185,7 +185,7 @@ mv -f $RPM_BUILD_ROOT%{_sbindir}/telnetd $RPM_BUILD_ROOT%{_sbindir}/telnetd.srp
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post   lib -p /sbin/ldconfig
+%post	lib -p /sbin/ldconfig
 %postun lib -p /sbin/ldconfig
 
 %files
@@ -193,7 +193,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/* inst/INSTALL*
 %attr( 755,root,root) /bin/login.srp
 %attr(4755,root,root) /bin/su.srp
-%attr(755,root,root)  %{_sbindir}/tconf
+%attr(755,root,root) %{_sbindir}/tconf
 %attr(4755,root,root) %{_bindir}/passwd.srp
 %attr(600,root,root) %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/tpasswd
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/pam.d/*
