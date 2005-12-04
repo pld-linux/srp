@@ -226,7 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(4755,root,root) /bin/su.srp
 %attr(755,root,root) %{_sbindir}/tconf
 %attr(4755,root,root) %{_bindir}/passwd.srp
-%attr(600,root,root) %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/tpasswd
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/tpasswd
 #%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/pam.d/*
 # Pam modules are required by main srp package so we don't split them
 %attr(4755,root,root) /sbin/eps_chkpwd
