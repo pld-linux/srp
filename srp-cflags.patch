@@ -1,0 +1,11 @@
+--- srp-2.1.1/base/pam_eps/Makefile.in~	2006-02-27 00:06:13.000000000 +0000
++++ srp-2.1.1/base/pam_eps/Makefile.in	2006-02-27 00:09:32.000000000 +0000
+@@ -87,7 +87,7 @@
+ 		$(CC) $(CCSHARED) -o $@ $(LIBPASSWDOBJD) $(LIBS)
+ 
+ $(CHKPWD):	eps_chkpwd.c
+-		$(CC) -o $@ eps_chkpwd.c $(STATIC) $(LIBS)
++		$(CC) $(CFLAGS) -o $@ eps_chkpwd.c $(STATIC) $(LIBS)
+ 
+ install: all
+ 	mkdir -p $(FAKEROOT)$(SECUREDIR)
