@@ -10,6 +10,7 @@ Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
 # Source0-md5:	23e843f3e35927fa8613edd7e4265c71
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-paths.patch
+Patch2:		%{name}-cflags.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -126,6 +127,7 @@ Serwer FTP ze wsparciem dla protoko³u Secure Remote Password.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 cd libsrp
