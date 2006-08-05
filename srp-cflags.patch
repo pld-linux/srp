@@ -1,11 +1,20 @@
---- srp-2.1.1/base/pam_eps/Makefile.in~	2006-02-27 00:06:13.000000000 +0000
-+++ srp-2.1.1/base/pam_eps/Makefile.in	2006-02-27 00:09:32.000000000 +0000
-@@ -87,7 +87,7 @@
- 		$(CC) $(CCSHARED) -o $@ $(LIBPASSWDOBJD) $(LIBS)
+diff -Nur srp-2.1.1.orig/base/pam_eps/Makefile.in srp-2.1.1.cflags/base/pam_eps/Makefile.in
+--- srp-2.1.1.orig/base/pam_eps/Makefile.in	2006-08-05 03:19:40.000000000 +0200
++++ srp-2.1.1.cflags/base/pam_eps/Makefile.in	2006-08-05 03:28:00.000000000 +0200
+@@ -81,13 +81,13 @@
+ $(LIBOBJD): $(LIBSRC)
+ 
+ $(LIBAUTHSH):	$(LIBAUTHSRC) $(LIBOBJD)
+-		$(CC) $(CCSHARED) -o $@ $(LIBAUTHOBJD) $(LIBS)
++		$(CC) $(LDFLAGS) $(CCSHARED) -o $@ $(LIBAUTHOBJD) $(LIBS)
+ 
+ $(LIBPASSWDSH):	$(LIBPASSWDSRC) $(LIBOBJD)
+-		$(CC) $(CCSHARED) -o $@ $(LIBPASSWDOBJD) $(LIBS)
++		$(CC) $(LDFLAGS) $(CCSHARED) -o $@ $(LIBPASSWDOBJD) $(LIBS)
  
  $(CHKPWD):	eps_chkpwd.c
 -		$(CC) -o $@ eps_chkpwd.c $(STATIC) $(LIBS)
-+		$(CC) $(CFLAGS) -o $@ eps_chkpwd.c $(STATIC) $(LIBS)
++		$(CC) $(LDFLAGS) $(CFLAGS) -o $@ eps_chkpwd.c $(STATIC) $(LIBS)
  
  install: all
  	mkdir -p $(FAKEROOT)$(SECUREDIR)
