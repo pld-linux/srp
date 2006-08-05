@@ -1,7 +1,15 @@
 diff -Nur srp-2.1.1.orig/base/pam_eps/Makefile.in srp-2.1.1.cflags/base/pam_eps/Makefile.in
---- srp-2.1.1.orig/base/pam_eps/Makefile.in	2006-08-05 03:19:40.000000000 +0200
-+++ srp-2.1.1.cflags/base/pam_eps/Makefile.in	2006-08-05 03:28:00.000000000 +0200
-@@ -81,13 +81,13 @@
+--- srp-2.1.1.orig/base/pam_eps/Makefile.in	2006-08-05 03:35:32.000000000 +0200
++++ srp-2.1.1.cflags/base/pam_eps/Makefile.in	2006-08-05 03:36:11.000000000 +0200
+@@ -28,6 +28,7 @@
+ 
+ CPPFLAGS = @CPPFLAGS@ -I../../libsrp $(USE_LCKPWDF) $(NEED_LCKPWDF) $(EXTRAS)
+ CFLAGS = @CFLAGS@
++LDFLAGS = @LDFLAGS@
+ 
+ DISTFILES = Makefile.in Makefile.unix README README.pam-eps README.rpm \
+   SOURCES SPECS pam.conf.eps pam.conf.migrate \
+@@ -81,13 +82,13 @@
  $(LIBOBJD): $(LIBSRC)
  
  $(LIBAUTHSH):	$(LIBAUTHSRC) $(LIBOBJD)
