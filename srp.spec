@@ -3,7 +3,7 @@ Summary:	Secure Remote Password protocol
 Summary(pl):	Protokó³ SRP (bezpieczny system autoryzacji)
 Name:		srp
 Version:	2.1.1
-Release:	0.1
+Release:	0.2
 License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
