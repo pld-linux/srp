@@ -1,6 +1,6 @@
 # TODO: everything
 Summary:	Secure Remote Password protocol
-Summary(pl.UTF-8):   Protokół SRP (bezpieczny system autoryzacji)
+Summary(pl.UTF-8):	Protokół SRP (bezpieczny system autoryzacji)
 Name:		srp
 Version:	2.1.1
 Release:	0.2
@@ -39,7 +39,7 @@ technik autentyfikacji.
 
 %package libs
 Summary:	Shared SRP libraries
-Summary(pl.UTF-8):   Współdzielone biblioteki SRP
+Summary(pl.UTF-8):	Współdzielone biblioteki SRP
 Group:		Libraries
 
 %description libs
@@ -50,7 +50,7 @@ Współdzielone biblioteki SRP.
 
 %package devel
 Summary:	Headers files for SRP libraries
-Summary(pl.UTF-8):   Pliki nagłówkowe bibliotek SRP
+Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek SRP
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	openssl-devel
@@ -63,7 +63,7 @@ Pliki nagłówkowe bibliotek SRP.
 
 %package static
 Summary:	Static SRP libraries
-Summary(pl.UTF-8):   Statyczne biblioteki SRP
+Summary(pl.UTF-8):	Statyczne biblioteki SRP
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
@@ -75,7 +75,7 @@ Statyczne biblioteki SRP.
 
 %package telnet
 Summary:	Telnet client with SRP and IPv6 support
-Summary(pl.UTF-8):   Klient protokołu telnet ze wsparciem dla SRP i IPv6
+Summary(pl.UTF-8):	Klient protokołu telnet ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
 Requires:	%{name} = %{version}-%{release}
 
@@ -88,7 +88,7 @@ Password i IPv6.
 
 %package telnetd
 Summary:	Telnet server with SRP and IPv6 support
-Summary(pl.UTF-8):   Serwer protokołu telnet ze wsparciem dla SRP i IPv6
+Summary(pl.UTF-8):	Serwer protokołu telnet ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
@@ -101,7 +101,7 @@ Password i IPv6.
 
 %package ftp
 Summary:	FTP client with SRP support
-Summary(pl.UTF-8):   Klient FTP ze wsparciem dla SRP
+Summary(pl.UTF-8):	Klient FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
@@ -113,7 +113,7 @@ Klient FTP ze wsparciem dla protokołu Secure Remote Password.
 
 %package ftpd
 Summary:	FTP server with SRP support
-Summary(pl.UTF-8):   Serwer FTP ze wsparciem dla SRP
+Summary(pl.UTF-8):	Serwer FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
