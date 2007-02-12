@@ -1,6 +1,6 @@
 # TODO: everything
 Summary:	Secure Remote Password protocol
-Summary(pl):	ProtokÛ≥ SRP (bezpieczny system autoryzacji)
+Summary(pl.UTF-8):   Protok√≥≈Ç SRP (bezpieczny system autoryzacji)
 Name:		srp
 Version:	2.1.1
 Release:	0.2
@@ -30,27 +30,27 @@ exchange over potentially insecure networks. SRP offers both security
 and convenience improvements over authentication techniques currently
 in use.
 
-%description -l pl
-SRP oznacza protokÛ≥ Secure Remote Password i reprezentuje nowy
-mechanizm autentyfikacji bazuj±cej na has≥ach oraz wymianÍ kluczy
-przez potencjalnie niebezpieczne sieci. SRP oferuje zarÛwno
-bezpieczeÒstwo i ulepszenia w stosunku do innych aktualnie dostÍpnych
+%description -l pl.UTF-8
+SRP oznacza protok√≥≈Ç Secure Remote Password i reprezentuje nowy
+mechanizm autentyfikacji bazujƒÖcej na has≈Çach oraz wymianƒô kluczy
+przez potencjalnie niebezpieczne sieci. SRP oferuje zar√≥wno
+bezpiecze≈Ñstwo i ulepszenia w stosunku do innych aktualnie dostƒôpnych
 technik autentyfikacji.
 
 %package libs
 Summary:	Shared SRP libraries
-Summary(pl):	WspÛ≥dzielone biblioteki SRP
+Summary(pl.UTF-8):   Wsp√≥≈Çdzielone biblioteki SRP
 Group:		Libraries
 
 %description libs
 Shared SRP libraries.
 
-%description libs -l pl
-WspÛ≥dzielone biblioteki SRP.
+%description libs -l pl.UTF-8
+Wsp√≥≈Çdzielone biblioteki SRP.
 
 %package devel
 Summary:	Headers files for SRP libraries
-Summary(pl):	Pliki nag≥Ûwkowe bibliotek SRP
+Summary(pl.UTF-8):   Pliki nag≈Ç√≥wkowe bibliotek SRP
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	openssl-devel
@@ -58,70 +58,70 @@ Requires:	openssl-devel
 %description devel
 Headers files for SRP libraries.
 
-%description devel -l pl
-Pliki nag≥Ûwkowe bibliotek SRP.
+%description devel -l pl.UTF-8
+Pliki nag≈Ç√≥wkowe bibliotek SRP.
 
 %package static
 Summary:	Static SRP libraries
-Summary(pl):	Statyczne biblioteki SRP
+Summary(pl.UTF-8):   Statyczne biblioteki SRP
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static SRP libraries.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczne biblioteki SRP.
 
 %package telnet
 Summary:	Telnet client with SRP and IPv6 support
-Summary(pl):	Klient protoko≥u telnet ze wsparciem dla SRP i IPv6
+Summary(pl.UTF-8):   Klient protoko≈Çu telnet ze wsparciem dla SRP i IPv6
 Group:		Applications/Networking
 Requires:	%{name} = %{version}-%{release}
 
 %description telnet
 Telnet client with Secure Remote Password protocol and IPv6 support.
 
-%description telnet -l pl
-Klient protoko≥u telnet ze wsparciem dla protoko≥u Secure Remote
+%description telnet -l pl.UTF-8
+Klient protoko≈Çu telnet ze wsparciem dla protoko≈Çu Secure Remote
 Password i IPv6.
 
 %package telnetd
 Summary:	Telnet server with SRP and IPv6 support
-Summary(pl):	Serwer protoko≥u telnet ze wsparciem dla SRP i IPv6
+Summary(pl.UTF-8):   Serwer protoko≈Çu telnet ze wsparciem dla SRP i IPv6
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
 %description telnetd
 Telnet server with Secure Remote Password protocol and IPv6 support.
 
-%description telnetd -l pl
-Serwer protoko≥u telnet ze wsparciem dla protoko≥u Secure Remote
+%description telnetd -l pl.UTF-8
+Serwer protoko≈Çu telnet ze wsparciem dla protoko≈Çu Secure Remote
 Password i IPv6.
 
 %package ftp
 Summary:	FTP client with SRP support
-Summary(pl):	Klient FTP ze wsparciem dla SRP
+Summary(pl.UTF-8):   Klient FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
 %description ftp
 FTP client with Secure Remote Password protocol support.
 
-%description ftp -l pl
-Klient FTP ze wsparciem dla protoko≥u Secure Remote Password.
+%description ftp -l pl.UTF-8
+Klient FTP ze wsparciem dla protoko≈Çu Secure Remote Password.
 
 %package ftpd
 Summary:	FTP server with SRP support
-Summary(pl):	Serwer FTP ze wsparciem dla SRP
+Summary(pl.UTF-8):   Serwer FTP ze wsparciem dla SRP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
 %description ftpd
 FTP server with Secure Remote Password protocol support.
 
-%description ftpd -l pl
-Serwer FTP ze wsparciem dla protoko≥u Secure Remote Password.
+%description ftpd -l pl.UTF-8
+Serwer FTP ze wsparciem dla protoko≈Çu Secure Remote Password.
 
 %prep
 %setup -q
