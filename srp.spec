@@ -1,9 +1,12 @@
-# TODO: everything
+# TODO:
+# - init scripts
+# - configuration files
+# - pam configs
 Summary:	Secure Remote Password protocol
 Summary(pl.UTF-8):	Protokół SRP (bezpieczny system autoryzacji)
 Name:		srp
 Version:	2.1.2
-Release:	0.1
+Release:	1
 License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
