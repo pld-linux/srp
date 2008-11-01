@@ -303,5 +303,3 @@
  
  AC_ARG_ENABLE(shadowgrp, [  --enable-shadowgrp      enable shadow group support], AC_DEFINE(SHADOWGRP))
  AC_ARG_ENABLE(noisyshell, [  --enable-noisyshell	your shell prints motd, mail message], AC_DEFINE(NOISY_SHELL))
---- srp-2.1.0/ftp/configure.in.orig	2005-01-08 21:42:06.458681000 +0100
-+++ srp-2.1.0/ftp/configure.in	2005-01-08 21:59:29.834064720 +0100
