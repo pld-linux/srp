@@ -152,6 +152,7 @@ cd ../telnet
 %{__autoheader}
 %{__automake}
 cd ../ftp
+touch ../ltmain.sh
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
