@@ -152,18 +152,21 @@ cd ../telnet
 %{__autoheader}
 %{__automake}
 cd ../ftp
-touch ../ltmain.sh
+# workaround: install-sh missing here, AUX_DIR not defined explicitly
+touch install-sh
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
-automake -a -c --foreign
+%{__automake}
 cd ../base
+# see above
+touch install-sh
 %{__libtoolize}
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
-automake -a -c --foreign
+%{__automake}
 cd ..
 %{__aclocal}
 %{__autoconf}
@@ -240,17 +243,26 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_libdir}/libkrypto.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libkrypto.so.0
+%attr(755,root,root) %{_libdir}/libsrp.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libsrp.so.0
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
-%{_includedir}/*.h
+%attr(755,root,root) %{_libdir}/libkrypto.so
+%attr(755,root,root) %{_libdir}/libsrp.so
+%{_libdir}/libkrypto.la
+%{_libdir}/libsrp.la
+%{_includedir}/cstr.h
+%{_includedir}/krypto.h
+%{_includedir}/srp*.h
+%{_includedir}/t_*.h
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libkrypto.a
+%{_libdir}/libsrp.a
 
 %files telnet
 %defattr(644,root,root,755)
