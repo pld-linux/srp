@@ -1,0 +1,121 @@
+diff -ur srp-2.1.2.org/ftp/ftpd/ftpcmd.c srp-2.1.2/ftp/ftpd/ftpcmd.c
+--- srp-2.1.2.org/ftp/ftpd/ftpcmd.c	2002-02-13 07:49:25.000000000 +0100
++++ srp-2.1.2/ftp/ftpd/ftpcmd.c	2009-08-28 20:53:05.755904638 +0200
+@@ -2071,10 +2071,10 @@
+ #include <arpa/telnet.h>
+ 
+ /*
+- * getline - a hacked up version of fgets to ignore TELNET escape codes.
++ * getline_srp - a hacked up version of fgets to ignore TELNET escape codes.
+  */
+ char *
+-getline(s, n, iop)
++getline_srp(s, n, iop)
+ 	char *s;
+ 	register FILE *iop;
+ {
+@@ -2175,7 +2175,7 @@
+ 		*s = '\0';
+ 		return(s);
+ 	    }
+-	    if (debug) syslog(LOG_DEBUG, "getline got %d from %s <%s>\n", 
++	    if (debug) syslog(LOG_DEBUG, "getline_srp got %d from %s <%s>\n", 
+ 			      len, cs, mic?"MIC":"ENC");
+ #ifdef SRP
+ 	if (strcmp(auth_type, "SRP") == 0)
+@@ -2304,13 +2304,13 @@
+ 		case CMD:
+ 			(void) signal(SIGALRM, toolong);
+ 			(void) alarm((unsigned) timeout);
+-			if (getline(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
++			if (getline_srp(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
+ 				reply(221, "You could at least say goodbye.");
+ 				dologout(0);
+ 			}
+ 			(void) alarm(0);
+ 
+-			/* If getline() finds an error, the string is null */
++			/* If getline_srp() finds an error, the string is null */
+ 			if (*cbuf == '\0')
+ 				continue;
+ 
+diff -ur srp-2.1.2.org/ftp/ftpd/ftpcmd.y srp-2.1.2/ftp/ftpd/ftpcmd.y
+--- srp-2.1.2.org/ftp/ftpd/ftpcmd.y	2002-02-13 07:48:12.000000000 +0100
++++ srp-2.1.2/ftp/ftpd/ftpcmd.y	2009-08-28 20:53:05.759237045 +0200
+@@ -933,10 +933,10 @@
+ #include <arpa/telnet.h>
+ 
+ /*
+- * getline - a hacked up version of fgets to ignore TELNET escape codes.
++ * getline_srp - a hacked up version of fgets to ignore TELNET escape codes.
+  */
+ char *
+-getline(s, n, iop)
++getline_srp(s, n, iop)
+ 	char *s;
+ 	register FILE *iop;
+ {
+@@ -1037,7 +1037,7 @@
+ 		*s = '\0';
+ 		return(s);
+ 	    }
+-	    if (debug) syslog(LOG_DEBUG, "getline got %d from %s <%s>\n", 
++	    if (debug) syslog(LOG_DEBUG, "getline_srp got %d from %s <%s>\n", 
+ 			      len, cs, mic?"MIC":"ENC");
+ #ifdef SRP
+ 	if (strcmp(auth_type, "SRP") == 0)
+@@ -1166,13 +1166,13 @@
+ 		case CMD:
+ 			(void) signal(SIGALRM, toolong);
+ 			(void) alarm((unsigned) timeout);
+-			if (getline(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
++			if (getline_srp(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
+ 				reply(221, "You could at least say goodbye.");
+ 				dologout(0);
+ 			}
+ 			(void) alarm(0);
+ 
+-			/* If getline() finds an error, the string is null */
++			/* If getline_srp() finds an error, the string is null */
+ 			if (*cbuf == '\0')
+ 				continue;
+ 
+diff -ur srp-2.1.2.org/ftp/ftpd/ftpd.c srp-2.1.2/ftp/ftpd/ftpd.c
+--- srp-2.1.2.org/ftp/ftpd/ftpd.c	2003-05-16 09:54:33.000000000 +0200
++++ srp-2.1.2/ftp/ftpd/ftpd.c	2009-08-28 20:53:05.765904582 +0200
+@@ -173,7 +173,7 @@
+ extern	char *home;		/* pointer to home directory for glob */
+ extern	FILE *ftpd_popen(), *fopen(), *freopen();
+ extern	int  ftpd_pclose(), fclose();
+-extern	char *getline();
++extern	char *getline_srp();
+ extern	char cbuf[];
+ extern	off_t restart_point;
+ 
+@@ -1831,7 +1831,7 @@
+ 	if (!transflag)
+ 		return;
+ 	cp = tmpline;
+-	if (getline(cp, sizeof(tmpline), stdin) == NULL) {
++	if (getline_srp(cp, sizeof(tmpline), stdin) == NULL) {
+ 		reply(221, "You could at least say goodbye.");
+ 		dologout(0);
+ 	}
+diff -ur srp-2.1.2.org/telnet/telnet/commands.c srp-2.1.2/telnet/telnet/commands.c
+--- srp-2.1.2.org/telnet/telnet/commands.c	2003-06-26 11:43:34.000000000 +0200
++++ srp-2.1.2/telnet/telnet/commands.c	2009-08-28 20:53:05.775905015 +0200
+@@ -3084,12 +3084,12 @@
+ 		cnt--;
+ 	    tbuf = 0;
+ 	    if (cp == line || *--cp != '\n' || cp == line)
+-		goto getline;
++		goto getline_srp;
+ 	    *cp = '\0';
+ 	    if (rlogin == _POSIX_VDISABLE)
+ 		printf("%s\r\n", line);
+ 	} else {
+-	getline:
++	getline_srp:
+ 	    if (rlogin != _POSIX_VDISABLE)
+ 		printf("%s> ", prompt);
+ 	    if (fgets(line, sizeof(line), stdin) == NULL) {

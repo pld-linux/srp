@@ -6,7 +6,7 @@ Summary:	Secure Remote Password protocol
 Summary(pl.UTF-8):	Protokół SRP (bezpieczny system autoryzacji)
 Name:		srp
 Version:	2.1.2
-Release:	1
+Release:	2
 License:	SRP Open Source
 Group:		Applications/Networking
 Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
@@ -14,6 +14,7 @@ Source0:	http://srp.stanford.edu/source/%{name}-%{version}.tar.gz
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-paths.patch
 Patch2:		%{name}-cflags.patch
+Patch3:		%{name}-getline.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -131,6 +132,7 @@ Serwer FTP ze wsparciem dla protokołu Secure Remote Password.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 cd libsrp
