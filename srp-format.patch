@@ -1,0 +1,106 @@
+--- srp-2.1.2/telnet/libtelnet/read_password.c.orig	2001-04-03 13:35:14.000000000 +0200
++++ srp-2.1.2/telnet/libtelnet/read_password.c	2014-02-16 10:55:00.938691031 +0100
+@@ -57,6 +57,7 @@
+ #if	defined(RSA_ENCPWD) || defined(KRB4_ENCPWD) || defined(HAVE_SRP) || defined(TLS)
+ 
+ #include <stdio.h>
++#include <string.h>
+ #include <strings.h>
+ #include <sys/ioctl.h>
+ #include <signal.h>
+@@ -156,7 +157,7 @@
+     if(old_fflags & O_NDELAY)
+       fcntl(0, F_SETFL, old_fflags & ~O_NDELAY);
+     while (!ok) {
+-	(void) printf(prompt);
++	(void) fputs(prompt, stdout);
+ 	(void) fflush(stdout);
+ 	while (!fgets(s, max, stdin));
+ 
+@@ -272,7 +273,7 @@
+     if(old_fflags & O_NDELAY)
+       fcntl(0, F_SETFL, old_fflags & ~O_NDELAY);
+     while (!ok) {
+-	(void) printf(prompt);
++	(void) fputs(prompt, stdout);
+ 	(void) fflush(stdout);
+ 	while (!fgets(s, max, stdin));
+ 
+--- srp-2.1.2/telnet/telnet/utilities.c.orig	2000-12-07 09:18:40.000000000 +0100
++++ srp-2.1.2/telnet/telnet/utilities.c	2014-02-16 11:10:48.898651250 +0100
+@@ -47,6 +47,7 @@
+ #include <sys/time.h>
+ 
+ #include <ctype.h>
++#include <stdlib.h>
+ 
+ #include "general.h"
+ 
+@@ -867,13 +868,13 @@
+ 			    if (pointer[0] == TELOPT_OLD_ENVIRON) {
+ # ifdef	ENV_HACK
+ 				if (old_env_var == OLD_ENV_VALUE)
+-				    fprintf(NetTrace, "\" (VALUE) " + noquote);
++				    fputs("\" (VALUE) " + noquote, NetTrace);
+ 				else
+ # endif
+-				    fprintf(NetTrace, "\" VAR " + noquote);
++				    fputs("\" VAR " + noquote, NetTrace);
+ 			    } else
+ #endif /* OLD_ENVIRON */
+-				fprintf(NetTrace, "\" VALUE " + noquote);
++				fputs("\" VALUE " + noquote, NetTrace);
+ 			    noquote = 2;
+ 			    break;
+ 
+@@ -883,23 +884,23 @@
+ 			    if (pointer[0] == TELOPT_OLD_ENVIRON) {
+ # ifdef	ENV_HACK
+ 				if (old_env_value == OLD_ENV_VAR)
+-				    fprintf(NetTrace, "\" (VAR) " + noquote);
++				    fputs("\" (VAR) " + noquote, NetTrace);
+ 				else
+ # endif
+-				    fprintf(NetTrace, "\" VALUE " + noquote);
++				    fputs("\" VALUE " + noquote, NetTrace);
+ 			    } else
+ #endif /* OLD_ENVIRON */
+-				fprintf(NetTrace, "\" VAR " + noquote);
++				fputs("\" VAR " + noquote, NetTrace);
+ 			    noquote = 2;
+ 			    break;
+ 
+ 			case ENV_ESC:
+-			    fprintf(NetTrace, "\" ESC " + noquote);
++			    fputs("\" ESC " + noquote, NetTrace);
+ 			    noquote = 2;
+ 			    break;
+ 
+ 			case ENV_USERVAR:
+-			    fprintf(NetTrace, "\" USERVAR " + noquote);
++			    fputs("\" USERVAR " + noquote, NetTrace);
+ 			    noquote = 2;
+ 			    break;
+ 
+--- srp-2.1.2/telnet/telnetd/telnetd.c.orig	2003-04-04 13:35:25.000000000 +0200
++++ srp-2.1.2/telnet/telnetd/telnetd.c	2014-02-16 11:12:59.528645765 +0100
+@@ -842,7 +842,7 @@
+     char *error_message =
+ 	"Encryption was not successfully negotiated.  Goodbye.\r\n\r\n";
+ 
+-    fprintf(stderr,error_message);
++    fputs(error_message, stderr);
+     writenet(error_message, strlen(error_message));
+     netflush();
+     exit(1);
+--- srp-2.1.2/base/src/login.c.orig	2002-11-04 08:20:35.000000000 +0100
++++ srp-2.1.2/base/src/login.c	2014-02-16 12:01:06.741857933 +0100
+@@ -262,7 +262,7 @@
+ 		fclose(mfp);
+ 	} else
+ #endif
+-		printf(mesg);
++		fputs(mesg, stdout);
+ 	fflush(stdout);
+ }
+ 
