@@ -17,6 +17,8 @@ Patch2:		%{name}-cflags.patch
 Patch3:		%{name}-getline.patch
 Patch4:		%{name}-format.patch
 Patch5:		%{name}-bison.patch
+Patch6:		%{name}-openssl.patch
+Patch7:		%{name}-no-common.patch
 URL:		http://srp.stanford.edu/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -138,6 +140,8 @@ Serwer FTP ze wsparciem dla protokołu Secure Remote Password.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 %build
 cd libsrp

@@ -1,0 +1,600 @@
+--- srp-2.1.2/libsrp/t_math.c.orig	2007-01-17 08:00:39.000000000 +0100
++++ srp-2.1.2/libsrp/t_math.c	2024-09-21 19:15:26.723717109 +0200
+@@ -350,14 +350,14 @@ BigIntegerCmpInt(c1, c2)
+      unsigned int c2;
+ {
+ #ifdef OPENSSL
+-  if(c1->top > 1)
++  BN_ULONG w = BN_get_word(c1);
++  int longer = (w == (BN_TBIT | (BN_TBIT - 1)));
++  if (longer)
+     return 1;
+-  else if(c1->top < 1)
+-    return (c2 > 0) ? -1 : 0;
+   else {
+-    if(c1->d[0] > c2)
++    if(w > c2)
+       return 1;
+-    else if(c1->d[0] < c2)
++    else if(w < c2)
+       return -1;
+     else
+       return 0;
+@@ -697,12 +697,6 @@ BigIntegerModExp(r, b, e, m, c, a)
+   else if(a == NULL) {
+     BN_mod_exp(r, b, e, m, c);
+   }
+-#if OPENSSL_VERSION_NUMBER >= 0x00906000
+-  else if(b->top == 1) {  /* 0.9.6 and above has mont_word optimization */
+-    BN_ULONG B = b->d[0];
+-    BN_mod_exp_mont_word(r, B, e, m, c, a);
+-  }
+-#endif
+   else
+     BN_mod_exp_mont(r, b, e, m, c, a);
+   if(ctx)
+@@ -890,7 +884,7 @@ BigIntegerUseEngine(const char * engine)
+       /* 0.9.7 loses the BN_mod_exp method.  Pity. */
+       const RSA_METHOD * rsa = ENGINE_get_RSA(e);
+       if(rsa)
+-	default_modexp = (modexp_meth)rsa->bn_mod_exp;
++	default_modexp = (modexp_meth)RSA_meth_get_bn_mod_exp(rsa);
+ #else
+       default_modexp = (modexp_meth)ENGINE_get_BN_mod_exp(e);
+ #endif
+--- srp-2.1.2/libkrypto/cipher_imp_des.h.orig	2000-11-04 23:52:23.000000000 +0100
++++ srp-2.1.2/libkrypto/cipher_imp_des.h	2024-09-21 19:43:09.211377307 +0200
+@@ -24,6 +24,12 @@ extern "C" {
+ 
+ #include <openssl/des.h>
+ 
++#define des_cblock DES_cblock
++#define des_key_schedule DES_key_schedule
++#define des_key_sched(k,ks) DES_key_sched((k),&(ks))
++#define des_ecb_encrypt(i,o,k,e) DES_ecb_encrypt((i),(o),&(k),(e))
++#define des_ecb3_encrypt(i,o,k1,k2,k3,e) DES_ecb3_encrypt((i),(o),&(k1),&(k2),&(k3),(e))
++
+ #elif defined(CRYPTOLIB_DES)
+ 
+ #include "libcrypt.h"
+--- srp-2.1.2/telnet/libtelnet/enc_des.c.orig	2002-02-11 10:19:58.000000000 +0100
++++ srp-2.1.2/telnet/libtelnet/enc_des.c	2024-09-21 21:52:43.809258695 +0200
+@@ -54,6 +54,11 @@ static char sccsid[] = "@(#)enc_des.c	8.
+ #ifdef OPENSSL_DES
+ #include <openssl/rand.h>
+ #include <openssl/des.h>
++#define des_ecb_encrypt(i,o,k,e) DES_ecb_encrypt((i),(o),&(k),(e))
++#define des_fixup_key_parity DES_fixup_key_parity
++#define des_key_sched(k,ks) DES_key_sched((k),&(ks))
++#define des_random_key(r) DES_random_key((r))
++#define des_random_seed(key) RAND_seed(key, sizeof(DES_cblock))
+ #endif
+ #ifdef CRYPTOLIB_DES
+ #include "libcrypt.h"
+--- srp-2.1.2/telnet/libtelnet/enc_des_ede3.c.orig	2000-12-21 09:37:06.000000000 +0100
++++ srp-2.1.2/telnet/libtelnet/enc_des_ede3.c	2024-09-21 21:52:39.585948241 +0200
+@@ -57,6 +57,11 @@ static char sccsid[] = "@(#)enc_des_ede3
+ #ifdef OPENSSL_DES
+ #include <openssl/rand.h>
+ #include <openssl/des.h>
++#define des_ecb3_encrypt(i,o,k1,k2,k3,e) DES_ecb3_encrypt((i),(o),&(k1),&(k2),&(k3),(e))
++#define des_fixup_key_parity DES_fixup_key_parity
++#define des_key_sched(k,ks) DES_key_sched((k),&(ks))
++#define des_random_key(r) DES_random_key((r))
++#define des_random_seed(key) RAND_seed(key, sizeof(DES_cblock))
+ #endif
+ #ifdef CRYPTOLIB_DES
+ #include "libcrypt.h"
+--- srp-2.1.2/telnet/telnet/tlsutil.c.orig	2001-07-30 03:27:49.000000000 +0200
++++ srp-2.1.2/telnet/telnet/tlsutil.c	2024-09-21 21:54:47.738587312 +0200
+@@ -373,13 +373,13 @@ char read_char(void)
+  */
+ int verify_crl(int ok, X509_STORE_CTX *ctx)
+ {
+-    X509_OBJECT obj;
++    X509_OBJECT *obj;
+     X509_NAME *subject;
+     X509_NAME *issuer;
+     X509 *xs;
+     X509_CRL *crl;
+     X509_REVOKED *revoked;
+-    X509_STORE_CTX store_ctx;
++    X509_STORE_CTX *store_ctx;
+     long serial;
+     int i, n, rc;
+     char *cp;
+@@ -391,6 +391,10 @@ int verify_crl(int ok, X509_STORE_CTX *c
+     if (!crl_store)
+         return ok;
+ 
++    store_ctx = X509_STORE_CTX_new();
++    if (store_ctx == NULL)
++        return 0;
++
+     /*
+      * Determine certificate ingredients in advance
+      */
+@@ -433,11 +437,15 @@ int verify_crl(int ok, X509_STORE_CTX *c
+      * Try to retrieve a CRL corresponding to the _subject_ of
+      * the current certificate in order to verify it's integrity.
+      */
+-    memset((char *)&obj, 0, sizeof(obj));
+-    X509_STORE_CTX_init(&store_ctx, crl_store, NULL, NULL);
+-    rc = X509_STORE_get_by_subject(&store_ctx, X509_LU_CRL, subject, &obj);
+-    X509_STORE_CTX_cleanup(&store_ctx);
+-    crl = obj.data.crl;
++    obj = X509_OBJECT_new();
++    if (obj == NULL) {
++        X509_STORE_CTX_free(store_ctx);
++        return 0;
++    }
++    X509_STORE_CTX_init(store_ctx, crl_store, NULL, NULL);
++    rc = X509_STORE_get_by_subject(store_ctx, X509_LU_CRL, subject, obj);
++    X509_STORE_CTX_cleanup(store_ctx);
++    crl = X509_STORE_CTX_get0_current_crl(store_ctx);
+     if (rc > 0 && crl != NULL) {
+         /*
+          * Verify the signature on this CRL
+@@ -445,7 +453,8 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         if (X509_CRL_verify(crl, X509_get_pubkey(xs)) <= 0) {
+             fprintf(stderr, "Invalid signature on CRL!\r\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_CRL_SIGNATURE_FAILURE);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+ 
+@@ -456,27 +465,33 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         if (i == 0) {
+             fprintf(stderr, "Found CRL has invalid nextUpdate field.\r\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+         if (i < 0) {
+             fprintf(stderr, "Found CRL is expired - revoking all certificates until you get updated CRL.\r\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_CRL_HAS_EXPIRED);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+-        X509_OBJECT_free_contents(&obj);
++        X509_OBJECT_free(obj);
+     }
+ 
+     /*
+      * Try to retrieve a CRL corresponding to the _issuer_ of
+      * the current certificate in order to check for revocation.
+      */
+-    memset((char *)&obj, 0, sizeof(obj));
+-    X509_STORE_CTX_init(&store_ctx, crl_store, NULL, NULL);
+-    rc = X509_STORE_get_by_subject(&store_ctx, X509_LU_CRL, issuer, &obj);
+-    X509_STORE_CTX_cleanup(&store_ctx);
+-    crl = obj.data.crl;
++    obj = X509_OBJECT_new();
++    if (obj == NULL) {
++        X509_STORE_CTX_free(store_ctx);
++        return 0;
++    }
++    X509_STORE_CTX_init(store_ctx, crl_store, NULL, NULL);
++    rc = X509_STORE_get_by_subject(store_ctx, X509_LU_CRL, issuer, obj);
++    X509_STORE_CTX_cleanup(store_ctx);
++    crl = X509_STORE_CTX_get0_current_crl(store_ctx);
+     if (rc > 0 && crl != NULL) {
+         /*
+          * Check if the current certificate is revoked by this CRL
+@@ -484,8 +498,8 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         n = sk_X509_REVOKED_num(X509_CRL_get_REVOKED(crl));
+         for (i = 0; i < n; i++) {
+             revoked = sk_X509_REVOKED_value(X509_CRL_get_REVOKED(crl), i);
+-            if (ASN1_INTEGER_cmp(revoked->serialNumber, X509_get_serialNumber(xs)) == 0) {
+-                serial = ASN1_INTEGER_get(revoked->serialNumber);
++            if (ASN1_INTEGER_cmp(X509_REVOKED_get0_serialNumber(revoked), X509_get_serialNumber(xs)) == 0) {
++                serial = ASN1_INTEGER_get(X509_REVOKED_get0_serialNumber(revoked));
+                 cp = x509_name_oneline(issuer, NULL, 0);
+                 fprintf(stderr,
+ 		    "Certificate with serial %ld (0x%lX) revoked per CRL from issuer %s\r\n",
+@@ -493,11 +507,13 @@ int verify_crl(int ok, X509_STORE_CTX *c
+                 if (cp) free(cp);
+ 
+                 X509_STORE_CTX_set_error(ctx, X509_V_ERR_CERT_REVOKED);
+-                X509_OBJECT_free_contents(&obj);
++                X509_OBJECT_free(obj);
++                X509_STORE_CTX_free(store_ctx);
+                 return 0;
+             }
+         }
+-        X509_OBJECT_free_contents(&obj);
++        X509_OBJECT_free(obj);
++        X509_STORE_CTX_free(store_ctx);
+     }
+     return ok;
+ }
+@@ -543,7 +559,7 @@ int verify_callback(int ok, X509_STORE_C
+ 
+     if (!ok) {
+     	verify_error_flag = 1;
+-    	print_x509_v_error(prev_error = ctx->error);
++    	print_x509_v_error(prev_error = X509_STORE_CTX_get_error(ctx));
+     }
+     /* since the CRL check isn't included in the OpenSSL automatic certificate
+      * check, we must call verify_crl() after we first check what errors the
+@@ -552,8 +568,8 @@ int verify_callback(int ok, X509_STORE_C
+     ok = verify_crl(ok, ctx);
+     if (!ok) {
+     	verify_error_flag = 1;
+-	if (ctx->error != prev_error)
+-	    print_x509_v_error(ctx->error);
++	if (X509_STORE_CTX_get_error(ctx) != prev_error)
++	    print_x509_v_error(X509_STORE_CTX_get_error(ctx));
+     }
+     ok = 1;
+     return ok;
+@@ -630,13 +646,13 @@ static int out_write(BIO *b, const char
+   int lastch;
+ 
+   if(in) {
+-    lastch = (int) b->ptr;	/* Stash the last char in the ptr field */
++    lastch = (int) BIO_get_data(b);	/* Stash the last char in the ptr field */
+     for(i = inl; i > 0; --i, ++in) {
+       if(*in == '\n' && lastch != '\r')
+ 	putchar('\r');
+       putchar((lastch = *in));
+     }
+-    b->ptr = (void *) lastch;
++    BIO_set_data(b, (void *) lastch);
+   }
+   else
+     return 0;
+@@ -667,8 +683,8 @@ static int out_puts(BIO *b, const char *
+ 
+ static int out_new(BIO *b)
+ {
+-  b->init = 1;
+-  b->ptr = NULL;
++  BIO_set_init(b, 1);
++  BIO_set_data(b, NULL);
+   return 1;
+ }
+ 
+@@ -677,18 +693,7 @@ static int out_free(BIO *b)
+   return 1;
+ }
+ 
+-static BIO_METHOD method_stdout = {
+-  BIO_TYPE_FILE,
+-  "Standard output",
+-  out_write,
+-  out_read,
+-  out_puts,
+-  out_gets,
+-  out_ctrl,
+-  out_new,
+-  out_free,
+-  NULL
+-};
++static BIO_METHOD *method_stdout = NULL;
+ 
+ int seed_PRNG(void)
+ {
+@@ -825,12 +830,21 @@ int tls_init(void)
+     SSL_library_init();
+ #ifdef ZLIB
+     comp = COMP_zlib();
+-    if (comp && comp->type != NID_undef)
++    if (comp && COMP_get_type(comp) != NID_undef)
+         SSL_COMP_add_compression_method(0xE0, COMP_zlib());  /* EAY's ZLIB */
+ #endif /* ZLIB */
+ 
+-    /*bout = BIO_new_fp(stdout, BIO_NOCLOSE);*/
+-    bout = BIO_new(&method_stdout);
++    method_stdout = BIO_meth_new(BIO_TYPE_FILE, "Standard output");
++    if (method_stdout) {
++        BIO_meth_set_write(method_stdout, out_write);
++        BIO_meth_set_read(method_stdout, out_read);
++        BIO_meth_set_puts(method_stdout, out_puts);
++        BIO_meth_set_gets(method_stdout, out_gets);
++        BIO_meth_set_ctrl(method_stdout, out_ctrl);
++        BIO_meth_set_create(method_stdout, out_new);
++        BIO_meth_set_destroy(method_stdout, out_free);
++        bout = BIO_new(method_stdout);
++    }
+     ssl_ctx = SSL_CTX_new(tls_get_method());
+     if (!ssl_ctx) {
+ 	fprintf(stderr, "SSL_CTX_new() %s\r\n",
+@@ -1098,7 +1112,7 @@ int tls_try(void)
+     }
+ 
+     if(tls_debug) {
+-      ssl->debug = 1;
++      SSL_set_debug(ssl, 1);
+       BIO_set_callback(sbio, debug_callback);
+     }
+ 
+@@ -1227,6 +1241,8 @@ void tls_cleanup(void)
+     if (bout) {
+ 	BIO_free(bout);
+ 	bout = NULL;
++	BIO_meth_free(method_stdout);
++	method_stdout = NULL;
+     }
+ }
+ 
+@@ -1557,7 +1573,7 @@ tls_status(void)
+ 
+   printf("TLS: enabled\n");
+   if(tls_active) {
+-    switch(ssl->version) {
++    switch(SSL_version(ssl)) {
+     case TLS1_VERSION: printf("TLSv1 session is active\n"); break;
+     case SSL3_VERSION: printf("SSLv3 session is active\n"); break;
+     case SSL2_VERSION: /* Error! */
+@@ -1603,7 +1619,7 @@ tls_protocol(char *proto)
+     printf("Setting protocol to %s\n", proto);
+   }
+   else if(strcasecmp(proto, "sslv3") == 0 || strcasecmp(proto, "ssl3") == 0) {
+-    ssl_meth = SSLv3_client_method();
++    ssl_meth = SSLv23_client_method();
+     printf("Setting protocol to %s\n", proto);
+   }
+   else
+@@ -1652,7 +1668,7 @@ tls_setdebug(on)
+   else
+     tls_debug = on;
+   if(tls_active) {
+-    ssl->debug = tls_debug;
++    SSL_set_debug(ssl, tls_debug);
+     if(tls_debug) {
+       BIO_set_callback(sbio, debug_callback);
+       SSL_CTX_set_info_callback(ssl_ctx, state_debug_callback);
+--- srp-2.1.2/telnet/telnetd/tls_dh.h.orig	2000-10-20 08:35:58.000000000 +0200
++++ srp-2.1.2/telnet/telnetd/tls_dh.h	2024-09-22 08:00:04.815174152 +0200
+@@ -15,9 +15,11 @@ DH *get_dh512()
+ 	DH *dh;
+ 
+ 	if ((dh=DH_new()) == NULL) return(NULL);
+-	dh->p=BN_bin2bn(dh512_p,sizeof(dh512_p),NULL);
+-	dh->g=BN_bin2bn(dh512_g,sizeof(dh512_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	DH_set0_pqg(dh, 
++	    BN_bin2bn(dh512_p,sizeof(dh512_p),NULL),
++	    NULL,
++	    BN_bin2bn(dh512_g,sizeof(dh512_g),NULL));
++	if ((DH_get0_p(dh) == NULL) || (DH_get0_g(dh) == NULL))
+ 		return(NULL);
+ 	return(dh);
+ 	}
+@@ -46,9 +48,11 @@ DH *get_dh768()
+ 	DH *dh;
+ 
+ 	if ((dh=DH_new()) == NULL) return(NULL);
+-	dh->p=BN_bin2bn(dh768_p,sizeof(dh768_p),NULL);
+-	dh->g=BN_bin2bn(dh768_g,sizeof(dh768_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	DH_set0_pqg(dh,
++	    BN_bin2bn(dh768_p,sizeof(dh768_p),NULL),
++	    NULL,
++	    BN_bin2bn(dh768_g,sizeof(dh768_g),NULL));
++	if ((DH_get0_p(dh) == NULL) || (DH_get0_g(dh) == NULL))
+ 		return(NULL);
+ 	return(dh);
+ 	}
+@@ -81,9 +85,11 @@ DH *get_dh1024()
+ 	DH *dh;
+ 
+ 	if ((dh=DH_new()) == NULL) return(NULL);
+-	dh->p=BN_bin2bn(dh1024_p,sizeof(dh1024_p),NULL);
+-	dh->g=BN_bin2bn(dh1024_g,sizeof(dh1024_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	DH_set0_pqg(dh,
++	    BN_bin2bn(dh1024_p,sizeof(dh1024_p),NULL),
++	    NULL,
++	    BN_bin2bn(dh1024_g,sizeof(dh1024_g),NULL));
++	if ((DH_get0_p(dh) == NULL) || (DH_get0_g(dh) == NULL))
+ 		return(NULL);
+ 	return(dh);
+ 	}
+@@ -121,9 +127,11 @@ DH *get_dh1536()
+ 	DH *dh;
+ 
+ 	if ((dh=DH_new()) == NULL) return(NULL);
+-	dh->p=BN_bin2bn(dh1536_p,sizeof(dh1536_p),NULL);
+-	dh->g=BN_bin2bn(dh1536_g,sizeof(dh1536_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	DH_set0_pqg(dh,
++	    BN_bin2bn(dh1536_p,sizeof(dh1536_p),NULL),
++	    NULL,
++	    BN_bin2bn(dh1536_g,sizeof(dh1536_g),NULL));
++	if ((DH_get0_p(dh) == NULL) || (DH_get0_g(dh) == NULL))
+ 		return(NULL);
+ 	return(dh);
+ 	}
+@@ -169,9 +177,11 @@ DH *get_dh2048()
+ 	DH *dh;
+ 
+ 	if ((dh=DH_new()) == NULL) return(NULL);
+-	dh->p=BN_bin2bn(dh2048_p,sizeof(dh2048_p),NULL);
+-	dh->g=BN_bin2bn(dh2048_g,sizeof(dh2048_g),NULL);
+-	if ((dh->p == NULL) || (dh->g == NULL))
++	DH_set0_pqg(dh,
++	    BN_bin2bn(dh2048_p,sizeof(dh2048_p),NULL),
++	    NULL,
++	    BN_bin2bn(dh2048_g,sizeof(dh2048_g),NULL));
++	if ((DH_get0_p(dh) == NULL) || (DH_get0_g(dh) == NULL))
+ 		return(NULL);
+ 	return(dh);
+ 	}
+--- srp-2.1.2/telnet/telnetd/tlsutil.c.orig	2001-07-30 02:20:24.000000000 +0200
++++ srp-2.1.2/telnet/telnetd/tlsutil.c	2024-09-22 09:07:08.020045247 +0200
+@@ -337,13 +337,13 @@ void check_file(char **file)
+  */
+ int verify_crl(int ok, X509_STORE_CTX *ctx)
+ {
+-    X509_OBJECT obj;
++    X509_OBJECT *obj;
+     X509_NAME *subject;
+     X509_NAME *issuer;
+     X509 *xs;
+     X509_CRL *crl;
+     X509_REVOKED *revoked;
+-    X509_STORE_CTX store_ctx;
++    X509_STORE_CTX *store_ctx;
+     long serial;
+     int i, n, rc;
+     char *cp;
+@@ -360,6 +360,10 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         return ok;
+ #endif /* TLS_KRB5 */
+ 
++    store_ctx = X509_STORE_CTX_new();
++    if (store_ctx == NULL)
++        return 0;
++
+     /*
+      * Determine certificate ingredients in advance
+      */
+@@ -402,11 +406,15 @@ int verify_crl(int ok, X509_STORE_CTX *c
+      * Try to retrieve a CRL corresponding to the _subject_ of
+      * the current certificate in order to verify it's integrity.
+      */
+-    memset((char *)&obj, 0, sizeof(obj));
+-    X509_STORE_CTX_init(&store_ctx, crl_store, NULL, NULL);
+-    rc = X509_STORE_get_by_subject(&store_ctx, X509_LU_CRL, subject, &obj);
+-    X509_STORE_CTX_cleanup(&store_ctx);
+-    crl = obj.data.crl;
++    obj = X509_OBJECT_new();
++    if (obj == NULL) {
++        X509_STORE_CTX_free(store_ctx);
++        return 0;
++    }
++    X509_STORE_CTX_init(store_ctx, crl_store, NULL, NULL);
++    rc = X509_STORE_get_by_subject(store_ctx, X509_LU_CRL, subject, obj);
++    X509_STORE_CTX_cleanup(store_ctx);
++    crl = X509_STORE_CTX_get0_current_crl(store_ctx);
+     if (rc > 0 && crl != NULL) {
+         /*
+          * Verify the signature on this CRL
+@@ -414,7 +422,8 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         if (X509_CRL_verify(crl, X509_get_pubkey(xs)) <= 0) {
+             fprintf(stderr, "Invalid signature on CRL!\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_CRL_SIGNATURE_FAILURE);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+ 
+@@ -425,28 +434,34 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         if (i == 0) {
+             fprintf(stderr, "Found CRL has invalid nextUpdate field.\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+         if (i < 0) {
+             fprintf(stderr,
+ 		"Found CRL is expired - revoking all certificates until you get updated CRL.\n");
+             X509_STORE_CTX_set_error(ctx, X509_V_ERR_CRL_HAS_EXPIRED);
+-            X509_OBJECT_free_contents(&obj);
++            X509_OBJECT_free(obj);
++            X509_STORE_CTX_free(store_ctx);
+             return 0;
+         }
+-        X509_OBJECT_free_contents(&obj);
++        X509_OBJECT_free(obj);
+     }
+ 
+     /*
+      * Try to retrieve a CRL corresponding to the _issuer_ of
+      * the current certificate in order to check for revocation.
+      */
+-    memset((char *)&obj, 0, sizeof(obj));
+-    X509_STORE_CTX_init(&store_ctx, crl_store, NULL, NULL);
+-    rc = X509_STORE_get_by_subject(&store_ctx, X509_LU_CRL, issuer, &obj);
+-    X509_STORE_CTX_cleanup(&store_ctx);
+-    crl = obj.data.crl;
++    obj = X509_OBJECT_new();
++    if (obj == NULL) {
++        X509_STORE_CTX_free(store_ctx);
++        return 0;
++    }
++    X509_STORE_CTX_init(store_ctx, crl_store, NULL, NULL);
++    rc = X509_STORE_get_by_subject(store_ctx, X509_LU_CRL, issuer, obj);
++    X509_STORE_CTX_cleanup(store_ctx);
++    crl = X509_STORE_CTX_get0_current_crl(store_ctx);
+     if (rc > 0 && crl != NULL) {
+         /*
+          * Check if the current certificate is revoked by this CRL
+@@ -454,9 +469,9 @@ int verify_crl(int ok, X509_STORE_CTX *c
+         n = sk_X509_REVOKED_num(X509_CRL_get_REVOKED(crl));
+         for (i = 0; i < n; i++) {
+             revoked = sk_X509_REVOKED_value(X509_CRL_get_REVOKED(crl), i);
+-            if (ASN1_INTEGER_cmp(revoked->serialNumber, X509_get_serialNumber(xs)) == 0) {
++            if (ASN1_INTEGER_cmp(X509_REVOKED_get0_serialNumber(revoked), X509_get_serialNumber(xs)) == 0) {
+ 
+-                serial = ASN1_INTEGER_get(revoked->serialNumber);
++                serial = ASN1_INTEGER_get(X509_REVOKED_get0_serialNumber(revoked));
+                 cp = x509_name_oneline(issuer, NULL, 0);
+                 syslog(LOG_INFO,
+ 		    "Certificate with serial %ld (0x%lX) revoked per CRL from issuer %s",
+@@ -464,11 +479,13 @@ int verify_crl(int ok, X509_STORE_CTX *c
+                 if (cp) free(cp);
+ 
+                 X509_STORE_CTX_set_error(ctx, X509_V_ERR_CERT_REVOKED);
+-                X509_OBJECT_free_contents(&obj);
++                X509_OBJECT_free(obj);
++                X509_STORE_CTX_free(store_ctx);
+                 return 0;
+             }
+         }
+-        X509_OBJECT_free_contents(&obj);
++        X509_OBJECT_free(obj);
++        X509_STORE_CTX_free(store_ctx);
+     }
+     return ok;
+ }
+@@ -487,7 +504,7 @@ int verify_callback(int ok, X509_STORE_C
+ 
+     ok =  verify_crl(ok, ctx);
+     if (!ok) {
+-    	switch (ctx->error) {
++    	switch (X509_STORE_CTX_get_error(ctx)) {
+ 	    case X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT:
+ 	    	syslog(LOG_INFO, "Error: Client's certificate is self signed.");
+ 		ok = 0;
+@@ -520,7 +537,7 @@ int verify_callback(int ok, X509_STORE_C
+ 		break;
+ 	    default:
+ 	    	syslog(LOG_INFO,
+-		    "Error: Error %d while verifying server's certificate.", ctx->error);
++		    "Error: Error %d while verifying server's certificate.", X509_STORE_CTX_get_error(ctx));
+ 		ok = 0;
+ 	    	break;
+ 	}
+@@ -695,7 +712,7 @@ int tls_init(void)
+     SSL_library_init();
+ #ifdef ZLIB
+     comp = COMP_zlib();
+-    if (comp && comp->type != NID_undef)
++    if (comp && COMP_get_type(comp) != NID_undef)
+         SSL_COMP_add_compression_method(0xE0, COMP_zlib());  /* EAY's ZLIB */
+ #endif /* ZLIB */
+     if (seed_PRNG())
+@@ -942,7 +959,10 @@ int tls_is_user_valid(char *user)
+ 	return 0;
+     }
+     while (file_cert = PEM_read_X509(fp, NULL, NULL, NULL)) {
+-	if (!M_ASN1_BIT_STRING_cmp(client_cert->signature, file_cert->signature))
++	ASN1_BIT_STRING *client_sign, *file_sign;
++	X509_get0_signature(&client_sign, NULL, client_cert);
++	X509_get0_signature(&file_sign, NULL, file_cert);
++	if (!ASN1_STRING_cmp(client_sign, file_sign))
+ 	    r = 1;
+ 	X509_free(file_cert);
+ 	if (r)
